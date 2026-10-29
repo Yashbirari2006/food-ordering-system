@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Food Ordering System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #243047;
+            max-width: 950px;
+            margin: 35px auto;
+            padding: 0 18px;
+        }
+        header, section {
+            background: white;
+            padding: 22px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000b;
+        }
+        h1, h2 { color: #e45c35; }
+        input, select, button {
+            padding: 11px;
+            margin: 6px 3px;
+            border: 1px solid #d7deea;
+            border-radius: 6px;
+        }
+        button {
+            background: #e45c35;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            padding: 11px;
+            text-align: left;
+            border-bottom: 1px solid #e7ebf1;
+        }
+        th { background: #fff1eb; }
+        .message { color: #17834b; }
+        .delete { background: #c83232; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🍔 Food Ordering System</h1>
+        <p>Simple food ordering powered by MySQL</p>
+    </header>
+
+    <section>
+        <h2>Place Your Order</h2>
+        {% for message in get_flashed_messages() %}
+            <p class="message">{{ message }}</p>
+        {% endfor %}
+
+        <form method="POST">
+            <input name="customer_name" placeholder="Customer name"
+                   required maxlength="100">
+
+            <select name="food_id" required>
+                {% for food in foods %}
+                    <option value="{{ food.food_id }}">
+                        {{ food.food_name }} - ₹{{ food.price }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <input type="number" name="quantity" min="1"
+                   max="100" value="1" required>
+
+            <button type="submit">Place Order</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>Available Menu</h2>
+        <table>
+            <tr><th>Food ID</th><th>Food Name</th><th>Price</th></tr>
+            {% for food in foods %}
+            <tr>
+                <td>{{ food.food_id }}</td>
+                <td>{{ food.food_name }}</td>
+                <td>₹{{ food.price }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </section>
+
+    <section>
+        <h2>Saved Orders</h2>
+        <table>
+            <tr>
+                <th>ID</th><th>Customer</th><th>Food</th>
+                <th>Qty</th><th>Total</th><th>Action</th>
+            </tr>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.order_id }}</td>
+                <td>{{ order.customer_name }}</td>
+                <td>{{ order.food_name }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>₹{{ order.total }}</td>
+                <td>
+                    <form method="POST"
+                          action="{{ url_for('delete_order', order_id=order.order_id) }}"
+                          onsubmit="return confirm('Delete this order?')">
+                        <button class="delete" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">No orders yet. Place your first order!</td></tr>
+            {% endfor %}
+        </table>
+    </section>
+</body>
+</html>
